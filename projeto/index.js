@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000; // Porta padrão para Vercel
+const port = 3001;
 const wss = new WebSocket.Server({ noServer: true });
 
 let points = 0;
@@ -37,12 +37,6 @@ wss.on('connection', (ws) => {
 });
 
 // Configurar o servidor Express para suportar WebSocket
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
-
 const server = app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
