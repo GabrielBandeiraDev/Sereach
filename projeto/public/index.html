@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WebSocket Test</title>
+  <title>WebSocket Points</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -12,45 +12,53 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
     }
-    #points {
+    .points-display {
       font-size: 2em;
       margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
     }
     button {
       padding: 10px 20px;
       font-size: 1em;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div id="points">Loading...</div>
-  <button onclick="incrementPoints()">Increment Points</button>
+  <div class="points-display">Points: <span id="points">0</span></div>
+  <div class="controls">
+    <button id="increment">Increment</button>
+    <button id="decrement">Decrement</button>
+  </div>
 
   <script>
-    const ws = new WebSocket(`ws://${window.location.host}`);
-
-    ws.onopen = () => {
-      console.log('WebSocket connection opened');
-    };
+    const ws = new WebSocket('ws://localhost:3001');
+    const pointsDisplay = document.getElementById('points');
+    const incrementButton = document.getElementById('increment');
+    const decrementButton = document.getElementById('decrement');
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.points !== undefined) {
-        document.getElementById('points').innerText = `Points: ${data.points}`;
+        pointsDisplay.textContent = data.points;
       }
     };
 
-    ws.onclose = () => {
-      console.log('WebSocket connection closed');
+    incrementButton.onclick = () => {
+      const currentPoints = parseInt(pointsDisplay.textContent);
+      ws.send(JSON.stringify({ points: currentPoints + 1 }));
     };
 
-    function incrementPoints() {
-      const currentPoints = parseInt(document.getElementById('points').innerText.split(' ')[1]);
-      const newPoints = currentPoints + 1;
-      ws.send(JSON.stringify({ points: newPoints }));
-    }
+    decrementButton.onclick = () => {
+      const currentPoints = parseInt(pointsDisplay.textContent);
+      ws.send(JSON.stringify({ points: currentPoints - 1 }));
+    };
   </script>
 </body>
 </html>
-
